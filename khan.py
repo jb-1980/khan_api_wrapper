@@ -2,12 +2,18 @@ from rauth import OAuth1Service
 from time import time
 import json
 import requests
-from config import (
-    CONSUMER_KEY,
-    CONSUMER_SECRET,
-    KHAN_IDENTIFIER,
-    KHAN_PASSWORD,
-)
+
+try:
+    from config import (
+        CONSUMER_KEY,
+        CONSUMER_SECRET,
+        KHAN_IDENTIFIER,
+        KHAN_PASSWORD,
+    )
+except ModuleNotFoundError:
+    raise ModuleNotFoundError(
+        "config.py not found! Did you set the variables in config.py.template and change the name to config.py?"
+    )
 
 SERVER_URL = "http://www.khanacademy.org"
 REQUEST_TOKEN_URL = SERVER_URL + "/api/auth2/request_token"
@@ -268,7 +274,9 @@ class KhanAPI:
     # TODO implement the videos methods
 
     ############################################################################
-    #######  Personal API methods, many using the internal api #################
+    #######  Personal API methods, many using the internal api            ######
+    #######  While Khan Academy does not discourage using these endpoints ######
+    #######  they warn that they may break without notice.                ######
     ############################################################################
     def get_mission(self, mission):
         """
