@@ -1,0 +1,8 @@
+# get the key and secret from https://www.khanacademy.org/api-apps/register
+CONSUMER_KEY = "yourappkey"
+CONSUMER_SECRET = "yourappsecret"
+
+# This is the username and password of the account you used to register the app
+# This allows us to authenticate without the browser
+KHAN_IDENTIFIER = "khan_username"
+KHAN_PASSWORD = "khan_password"
