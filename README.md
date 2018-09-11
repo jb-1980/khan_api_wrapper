@@ -69,7 +69,7 @@ def get_tokens():
     return tokens["token"], tokens["secret"]
 
 # Then use the function to ensure we only use fresh tokens
-token, secret = get_Tokens()
+token, secret = get_tokens()
 kapi = KhanAPI(token, secret)
 ...
 ```
