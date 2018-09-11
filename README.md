@@ -1,5 +1,5 @@
 # KhanAPI (Python 3 Wrapper for Khan Academy API)
-===============
+------------------------------------------------
 
 ## About
 This is a simple implementation of using the Khan Academy API with python. It uses the alternative method of logging in with your own account, and should be sufficient if you are only looking to retrieve data from your students.
