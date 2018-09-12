@@ -43,28 +43,28 @@ See `example.py` for ideas on how to integrate into your own project, and examin
 
 Through trial I have discovered that the access token and secret are valid for 2 weeks. So you may consider storing them in a separate file or database, and write a function to only fetch tokens if they are expired.
 
-```
+```python
 def get_tokens():
-    # fetch token data from saved json file
-    with open('tokens.json', 'r') as f:
-        tokens = json.loads(f)
 
+    # fetch token data from saved json file
+    with open("tokens.json", "r") as f:
+        tokens = json.loads(f.read())
+    
     # check if tokens are expired
     now = time.time()
     if now - tokens["timestamp"] > 3600 * 24 * 14:
+        kauth = KhanAcademySignIn()
         token, secret = kauth.authorize_self()
-
+        
         # update file with new tokens and timestamp
-        with open('tokens.json', 'w') as t:
-            t.write(json.dumps({
-              "token": token,
-              "secret": secret,
-              "timestamp": now,
-            }))
-
+        with open("tokens.json", "w") as t:
+            t.write(
+                json.dumps({"token": token, "secret": secret, "timestamp": now})
+            )
+        
         # return fresh tokens
         return token, secret
-
+        
     # tokens are still valid, so return them
     return tokens["token"], tokens["secret"]
 
