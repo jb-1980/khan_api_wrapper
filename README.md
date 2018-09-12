@@ -1,4 +1,4 @@
-# KhanAPI (Python 3 Wrapper for Khan Academy API)
+# KhanAPI (Python 3 Wrapper for [Khan Academy API](https://github.com/Khan/khan-api))
 ------------------------------------------------
 
 ## About
