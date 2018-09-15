@@ -2,6 +2,7 @@ from rauth import OAuth1Service
 from time import time
 import json
 import requests
+import graphql_schema as gql
 
 try:
     from config import (
@@ -346,6 +347,17 @@ class KhanAPI:
                 out.append(datum)
         return out
 
+    def join_class(class_code):
+        """
+        endpoint to join a class by the class code
+        """
+        endpoint = "/api/internal/user/joinclass/%s" % class_code
+        return self.get_resource(endpoint)
+
+    ############################################################################
+    ###  GRAPHQL endpoints  ####################################################
+    ############################################################################
+
     def post_graphql(self, params={}, data={}):
         """
         Retrieve resources using the graphql schema
@@ -354,11 +366,49 @@ class KhanAPI:
 
         return self.post("/api/internal/graphql", params, data, headers)
 
+    # QUERIES
+
     def simple_completion_query(self, assignment_id):
         data = {
             "operationName": "simpleCompletionQuery",
             "variables": {"assignmentId": assignment_id},
-            "query": """query simpleCompletionQuery($assignmentId: String!) {\n  coach {\n    id\n    assignment(id: $assignmentId) {\n      assignedDate\n      dueDate\n      id\n      itemCompletionStates {\n        student {\n          id\n          kaid\n          coachNickname\n          profileRoot\n          __typename\n        }\n        state\n        completedOn\n        bestScore {\n          numCorrect\n          numAttempted\n          __typename\n        }\n        exerciseAttempts {\n          id\n          isCompleted\n          numAttempted\n          numCorrect\n          lastAttemptDate\n          __typename\n        }\n        content {\n          id\n          translatedTitle\n          defaultUrlPath\n          kind\n          __typename\n        }\n        __typename\n      }\n      studentList {\n        id\n        name\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}\n""",
+            "query": gql.simpleCompletionQuery,
+        }
+
+        params = {"lang": "en", "_": round(time() * 1000)}
+
+        return self.post_graphql(params, json.dumps(data))
+
+    def get_students_list(self, hasClassId=False, classId="", pageSize=1000):
+        data = {
+            "operationName": "getStudentsList",
+            "variables": {
+                "hasClassId": hasClassId,
+                "classId": classId,
+                "pageSize": pageSize,
+            },
+            "query": gql.getStudentsList,
+        }
+
+        params = {"lang": "en", "_": round(time() * 1000)}
+
+        return self.post_graphql(params, json.dumps(data))
+
+    # MUTATIONS
+
+    def stop_coaching(self, kaids):
+        """
+        A method to quickly remove inactive students from being coached.
+        :param: kaids, list of kaids you want to stop coaching
+        """
+        data = {
+            "operationName": "stopCoaching",
+            "variables": {
+                "coachRequestIds": [],
+                "invitationIds": [],
+                "kaids": kaids,
+            },
+            "query": gql.stopCoaching,
         }
 
         params = {"lang": "en", "_": round(time() * 1000)}
