@@ -4,7 +4,13 @@ from datetime import datetime
 
 # First authenticate with Khan Academy. This will only work for the account
 # used to register the app, and if the account settings are set up in config.py
-kauth = KhanAcademySignIn()
+consumer_key = "Key from registering app"
+consumer_token = "Token from registering app"
+khan_identifier = "username_of_account_used_to_register_app"
+khan_password = "password_of_account_used_to_register_app"
+kauth = KhanAcademySignIn(
+    consumer_key, consumer_token, khan_identifier, khan_password
+)
 token, secret = kauth.authorize_self()
 
 # Now instatiate the authenticated khan api class, which can be used to fetch
@@ -16,7 +22,7 @@ user = kapi.user()
 # pprint(user)
 
 # Fetch data from undocumented api call. Use these cautiously as they are not
-# garaunteed to work. See https://github.com/Khan/khan-api/wiki/Khan-Academy-API-Authentication#the-endpoints-exposed-on-the-api-explorer-dont-seem-to-do-what-i-need-am-i-ableallowed-to-access-any-other-endpoints
+# gauranteed to work. See https://github.com/Khan/khan-api/wiki/Khan-Academy-API-Authentication#the-endpoints-exposed-on-the-api-explorer-dont-seem-to-do-what-i-need-am-i-ableallowed-to-access-any-other-endpoints
 params = {
     "dt_start": "1970-09-08T07:00:00.000Z",
     "dt_end": datetime.utcnow().replace(microsecond=0).isoformat() + "Z",

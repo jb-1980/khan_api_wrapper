@@ -2,19 +2,8 @@ from rauth import OAuth1Service
 from time import time
 import json
 import requests
-import graphql_schema as gql
+from khan_api_wrapper import graphql_schema as gql
 
-try:
-    from config import (
-        CONSUMER_KEY,
-        CONSUMER_SECRET,
-        KHAN_IDENTIFIER,
-        KHAN_PASSWORD,
-    )
-except ModuleNotFoundError:
-    raise ModuleNotFoundError(
-        "config.py not found! Did you set the variables in config.py.template and change the name to config.py?"
-    )
 
 SERVER_URL = "http://www.khanacademy.org"
 REQUEST_TOKEN_URL = SERVER_URL + "/api/auth2/request_token"
@@ -22,24 +11,26 @@ ACCESS_TOKEN_URL = SERVER_URL + "/api/auth2/access_token"
 AUTHORIZE_URL = SERVER_URL + "/api/auth2/authorize"
 BASE_URL = SERVER_URL + "/api/auth2"
 
-# TODO Add a method that will allow general authorization. It will require setting
-# up a callback server, and then responding to that callback. A more complete
-# class can be seen at https://github.com/jb-1980/mission-control/blob/master/app/oauth.py
+
 class KhanAcademySignIn:
     """
     Class to set up the rauth service and use it to retrieve the access tokens
     """
 
-    def __init__(self):
+    def __init__(
+        self, consumer_key, consumer_secret, khan_identifier, khan_password
+    ):
         self.service = OAuth1Service(
             name="Grade Syncer",
-            consumer_key=CONSUMER_KEY,
-            consumer_secret=CONSUMER_SECRET,
+            consumer_key=consumer_key,
+            consumer_secret=consumer_secret,
             request_token_url=REQUEST_TOKEN_URL,
             access_token_url=ACCESS_TOKEN_URL,
             authorize_url=AUTHORIZE_URL,
             base_url=BASE_URL,
         )
+        self.khan_identifier = khan_identifier
+        self.khan_password = khan_password
 
     ## Only going to implement the ability to authorize with the credentials
     ## of the account used to create the app. This has the benefit of avoiding
@@ -55,8 +46,8 @@ class KhanAcademySignIn:
         # Authorize token by logging into your own account
         data = {
             "oauth_token": request_token,
-            "identifier": KHAN_IDENTIFIER,
-            "password": KHAN_PASSWORD,
+            "identifier": self.khan_identifier,
+            "password": self.khan_password,
         }
 
         # Posting to the authorize url will then authenticate the request token
@@ -398,7 +389,7 @@ class KhanAPI:
 
     def stop_coaching(self, kaids):
         """
-        A method to quickly remove inactive students from being coached.
+        A method to remove inactive students from being coached.
         :param: kaids, list of kaids you want to stop coaching
         """
         data = {
@@ -409,6 +400,28 @@ class KhanAPI:
                 "kaids": kaids,
             },
             "query": gql.stopCoaching,
+        }
+
+        params = {"lang": "en", "_": round(time() * 1000)}
+
+        return self.post_graphql(params, json.dumps(data))
+
+    def transfer_students(self, fromListIds, toListIds, kaids):
+        """
+        A method to add or remove students from a course
+        :param: fromListIds, a list of course ids being transferred from
+        :param: toListIds, a list of course ids that kaids is being transferred to
+        :param: kaids, list of kaids that are being transferred
+        if toListIds = [], will remove kaids from the course
+        """
+        data = {
+            "operationName": "transferStudents",
+            "variables": {
+                "coachRequestIds": [],
+                "invitationIds": [],
+                "kaids": kaids,
+            },
+            "query": gql.transferStudents,
         }
 
         params = {"lang": "en", "_": round(time() * 1000)}
