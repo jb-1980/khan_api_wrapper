@@ -1,4 +1,4 @@
-from khan import KhanAcademySignIn, KhanAPI
+from khan_api_wrapper.khan import KhanAcademySignIn, KhanAPI
 from pprint import pprint
 from datetime import datetime
 
@@ -15,7 +15,7 @@ token, secret = kauth.authorize_self()
 
 # Now instatiate the authenticated khan api class, which can be used to fetch
 # protected endpoints
-kapi = KhanAPI(token, secret)
+kapi = KhanAPI(consumer_key, consumer_token, token, secret)
 
 # Fetch data from documented api call
 user = kapi.user()

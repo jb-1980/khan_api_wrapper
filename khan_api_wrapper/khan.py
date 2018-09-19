@@ -71,15 +71,25 @@ class KhanAPI:
     be added to align with those found at https://api-explorer.khanacademy.org/
     """
 
-    def __init__(self, access_token=None, access_token_secret=None):
+    def __init__(
+        self,
+        consumer_key=None,
+        consumer_secret=None,
+        access_token=None,
+        access_token_secret=None,
+    ):
         self.authorized = False
         # We need an access token and secret to make authorized calls
         # Otherwise we can only access open endpoints
         if access_token and access_token_secret:
+            if consumer_key == None or consumer_secret == None:
+                raise ValueError(
+                    "consumer_key and consumer_secret must be provided if access tokens are provided"
+                )
             self.service = OAuth1Service(
                 name="khan_oauth",
-                consumer_key=CONSUMER_KEY,
-                consumer_secret=CONSUMER_SECRET,
+                consumer_key=consumer_key,
+                consumer_secret=consumer_secret,
                 request_token_url=REQUEST_TOKEN_URL,
                 access_token_url=ACCESS_TOKEN_URL,
                 authorize_url=AUTHORIZE_URL,
