@@ -27,7 +27,7 @@ $ python
 > kauth = KhanAcademySignIn(consumer_key, consumer_token, khan_identifier, khan_password)
 > token, secret = kauth.authenticate_self()
 >
-> kapi = KhanApi(token, secret)
+> kapi = KhanApi(consumer_key, consumer_token, token, secret)
 > kapi.user() # should print your user data to console.
 >
 > # Use your own endpoint
@@ -50,7 +50,7 @@ def get_tokens():
     # check if tokens are expired
     now = time.time()
     if now - tokens["timestamp"] > 3600 * 24 * 14:
-        kauth = KhanAcademySignIn(key, token, uname, pwd)
+        kauth = KhanAcademySignIn(consumer_key, consumer_secret, token, uname, pwd)
         token, secret = kauth.authorize_self()
 
         # update file with new tokens and timestamp
@@ -67,6 +67,6 @@ def get_tokens():
 
 # Then use the function to ensure we only use fresh tokens when necessary
 token, secret = get_tokens()
-kapi = KhanAPI(token, secret)
+kapi = KhanAPI(consumer_key, consumer_secret, token, secret)
 ...
 ```
