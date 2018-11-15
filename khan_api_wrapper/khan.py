@@ -17,9 +17,7 @@ class KhanAcademySignIn:
     Class to set up the rauth service and use it to retrieve the access tokens
     """
 
-    def __init__(
-        self, consumer_key, consumer_secret, khan_identifier, khan_password
-    ):
+    def __init__(self, consumer_key, consumer_secret, khan_identifier, khan_password):
         self.service = OAuth1Service(
             name="Grade Syncer",
             consumer_key=consumer_key,
@@ -95,9 +93,7 @@ class KhanAPI:
                 authorize_url=AUTHORIZE_URL,
                 base_url=BASE_URL,
             )
-            self.session = self.service.get_session(
-                (access_token, access_token_secret)
-            )
+            self.session = self.service.get_session((access_token, access_token_secret))
             self.authorized = True
         self.get_resource = self.get
 
@@ -111,9 +107,7 @@ class KhanAPI:
                 # the programmer deal with a workaround. Otherwise, print the
                 # response details to the console for debugging.
                 if response.status_code == 500:
-                    print(
-                        "500 error receieved. You should do something with it!"
-                    )
+                    print("500 error receieved. You should do something with it!")
                     return {"error": 500}
                 print("#" * 50)
                 print("Status Code: ", response.status_code)
@@ -133,9 +127,7 @@ class KhanAPI:
                 SERVER_URL + url, data=data, params=params, headers=headers
             )
         else:
-            response = self.session.post(
-                SERVER_URL + url, data=data, params=params
-            )
+            response = self.session.post(SERVER_URL + url, data=data, params=params)
         try:
             return response.json()
         except ValueError:
@@ -200,9 +192,7 @@ class KhanAPI:
 
     def exercises_exercise_followup_exercises(self, name):
         """Retrieve all the exercises that list <name> as a prerequisite."""
-        return self.get_resource(
-            "/api/v1/exercises/%s/followup_exercises" % name
-        )
+        return self.get_resource("/api/v1/exercises/%s/followup_exercises" % name)
 
     def exercises_exercise_videos(self, name):
         """Retrieve a list of all videos associated with <name>."""
@@ -258,17 +248,14 @@ class KhanAPI:
         :param: exercises, optional list of exercises to filter. If none is provided,
         all exercises attempted by user will be returned."""
         return self.get_resource(
-            "/api/v1/user/exercises",
-            params={"exercises": exercises, **identifier},
+            "/api/v1/user/exercises", params={"exercises": exercises, **identifier}
         )
 
     def user_exercises_log(self, exercise, params={}):
         """
         Retrieve a list of ProblemLog entities for one exercise for one user.
         """
-        return self.get_resource(
-            "/api/v1/user/exercises/%s/log" % exercise, params
-        )
+        return self.get_resource("/api/v1/user/exercises/%s/log" % exercise, params)
 
     # TODO Finish implementing the user methods
 
@@ -287,9 +274,7 @@ class KhanAPI:
         return self.get_resource("/api/internal/user/mission/" + mission)
 
     def get_progress_info(self, params={}):
-        return self.get_resource(
-            "/api/internal/user/missions/progress_info", params
-        )
+        return self.get_resource("/api/internal/user/missions/progress_info", params)
 
     def get_missions(self, params={}):
         return self.get_resource("/api/internal/user/missions", params)
@@ -313,9 +298,7 @@ class KhanAPI:
         This is a way to get the basic exercise meta data as well as topic
         structure. It has a lot smaller footprint that get_all_exercises.
         """
-        return self.get_resource(
-            "/api/internal/exercises/math_topics_and_exercises"
-        )
+        return self.get_resource("/api/internal/exercises/math_topics_and_exercises")
 
     def get_many_exercises(self, exercises, kaid):
         """
@@ -395,6 +378,23 @@ class KhanAPI:
 
         return self.post_graphql(params, json.dumps(data))
 
+    def get_progress_by_student(self, class_id):
+
+        data = {
+            "operationName": "ProgressByStudent",
+            "query": gql.progressByStudent,
+            "variables": {
+                "classId": class_id,
+                "assignmentFilters": {"dueAfter": None, "dueBefore": None},
+                "contentKinds": None,
+                "pageSize": 9,
+            },
+        }
+
+        params = {"lang": "en", "_": round(time() * 1000)}
+
+        return self.post_graphql(params, json.dumps(data))
+
     # MUTATIONS
 
     def stop_coaching(self, kaids):
@@ -404,11 +404,7 @@ class KhanAPI:
         """
         data = {
             "operationName": "stopCoaching",
-            "variables": {
-                "coachRequestIds": [],
-                "invitationIds": [],
-                "kaids": kaids,
-            },
+            "variables": {"coachRequestIds": [], "invitationIds": [], "kaids": kaids},
             "query": gql.stopCoaching,
         }
 
@@ -426,14 +422,11 @@ class KhanAPI:
         """
         data = {
             "operationName": "transferStudents",
-            "variables": {
-                "coachRequestIds": [],
-                "invitationIds": [],
-                "kaids": kaids,
-            },
+            "variables": {"coachRequestIds": [], "invitationIds": [], "kaids": kaids},
             "query": gql.transferStudents,
         }
 
         params = {"lang": "en", "_": round(time() * 1000)}
 
         return self.post_graphql(params, json.dumps(data))
+

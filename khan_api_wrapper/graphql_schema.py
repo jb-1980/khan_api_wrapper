@@ -4,6 +4,13 @@ simpleCompletionQuery = """query simpleCompletionQuery($assignmentId: String!) {
   coach {
     id
     assignment(id: $assignmentId) {
+      contents {
+        id
+        translatedTitle
+        defaultUrlPath
+        kind
+        __typename
+      }
       assignedDate
       dueDate
       id
@@ -28,13 +35,6 @@ simpleCompletionQuery = """query simpleCompletionQuery($assignmentId: String!) {
           numAttempted
           numCorrect
           lastAttemptDate
-          __typename
-        }
-        content {
-          id
-          translatedTitle
-          defaultUrlPath
-          kind
           __typename
         }
         __typename
@@ -140,6 +140,56 @@ fragment StudentField on StudentsPage {
   __typename
 }
 """
+
+progressByStudent = """query ProgressByStudent($assignmentFilters: CoachAssignmentFilters, $contentKinds: [LearnableContentKind], $classId: String!, $pageSize: Int, $after: ID) {
+  coach {
+    id
+    studentList(id: $classId) {
+      id
+      students {
+        id
+        coachNickname
+        __typename
+      }
+      assignmentsPage(filters: $assignmentFilters, after: $after, pageSize: $pageSize) {
+        assignments(contentKinds: $contentKinds) {
+          id
+          assignmentType
+          dueDate
+          contents {
+            id
+            translatedTitle
+            kind
+            defaultUrlPath
+            __typename
+          }
+          itemCompletionStates {
+            completedOn
+            student {
+              id
+              __typename
+            }
+            bestScore {
+              numAttempted
+              numCorrect
+              __typename
+            }
+            __typename
+          }
+          __typename
+        }
+        pageInfo {
+          nextCursor
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+"""
 # MUTATIONS
 
 stopCoaching = """mutation stopCoaching($kaids: [ID], $invitationIds: [ID], $coachRequestIds: [ID]) {
@@ -164,3 +214,4 @@ transferStudents = """mutation transferStudents($fromListIds: [ID], $toListIds: 
   }
 }
 """
+
