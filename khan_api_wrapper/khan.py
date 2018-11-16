@@ -311,7 +311,7 @@ class KhanAPI:
         exercises.sort()
         out = []
         tmp_lst = []
-        params = {"exercises": []}
+        params = {"exercises": [], "kaid": kaid}
         while exercises:
             s = ""
             tmp_lst = []
