@@ -190,6 +190,25 @@ progressByStudent = """query ProgressByStudent($assignmentFilters: CoachAssignme
   }
 }
 """
+
+AutoAssignableStudents = """query AutoAssignableStudents($studentListId: String!) {
+  coach {
+    id
+    studentList(id: $studentListId) {
+      id
+      name
+      autoAssignableStudents {
+        id
+        kaid
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+"""
+
 # MUTATIONS
 
 stopCoaching = """mutation stopCoaching($kaids: [ID], $invitationIds: [ID], $coachRequestIds: [ID]) {
@@ -215,3 +234,23 @@ transferStudents = """mutation transferStudents($fromListIds: [ID], $toListIds: 
 }
 """
 
+updateAutoAssign = """mutation updateAutoAssign($studentListId: String!, $studentKaids: [ID]!, $autoAssign: Boolean!) {
+  updateAutoAssign(studentListId: $studentListId, studentKaids: $studentKaids, autoAssign: $autoAssign) {
+    coach {
+      id
+      studentList(id: $studentListId) {
+        id
+        name
+        autoAssignableStudents {
+          id
+          kaid
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+"""

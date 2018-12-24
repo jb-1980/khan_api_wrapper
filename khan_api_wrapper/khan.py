@@ -244,11 +244,32 @@ class KhanAPI:
 
     def user_exercises(self, identifier={}, exercises=[]):
         """Retrieve info about a user's interaction with exercises.
-        :param: identifier, on of four identifiers: username, userid, email, kaid
+        :param: identifier, one of four identifiers: username, userid, email, kaid
         :param: exercises, optional list of exercises to filter. If none is provided,
         all exercises attempted by user will be returned."""
         return self.get_resource(
             "/api/v1/user/exercises", params={"exercises": exercises, **identifier}
+        )
+
+    def user_exercises_name(self, exercise, identifier={}):
+        """Retrieve info about a specific exercise engaged by a specific user
+        identified with the name and identifier
+        :param: exercise, the specific exercise to get info for
+        :param: identifier, one of four identifiers: username, userid, email, kaid
+        """
+        return self.get_resource(
+            "/api/v1/user/exercises/" + exercise, params=identifier
+        )
+
+    def user_exercises_followup_exercises(self, exercise, indentifier={}):
+        """Retrieve info about all specific exercise listed as a prerequisite to
+        <exercise_name>
+        :param: exercise, the specific exercise to get info for
+        :param: identifier, one of four identifiers: username, userid, email, kaid
+        """
+        return self.get_resource(
+            "/api/v1/user/exercises/%s/followup_exercises" % exercise_name,
+            params=identifier,
         )
 
     def user_exercises_log(self, exercise, params={}):
@@ -256,6 +277,14 @@ class KhanAPI:
         Retrieve a list of ProblemLog entities for one exercise for one user.
         """
         return self.get_resource("/api/v1/user/exercises/%s/log" % exercise, params)
+
+    def user_exercises_progress_changes(self, exercise, params={}):
+        """
+        Retrieve a list of ProblemLog entities for one exercise for one user.
+        """
+        return self.get_resource(
+            "/api/v1/user/exercises/%s/progress_changes" % exercise, params
+        )
 
     # TODO Finish implementing the user methods
 
@@ -395,6 +424,22 @@ class KhanAPI:
 
         return self.post_graphql(params, json.dumps(data))
 
+    def auto_assignable_students(self, student_list_id):
+
+        data = {
+            "operationName": "AutoAssignableStudents",
+            "query": gql.AutoAssignableStudents,
+            "variables": {"studentListId": student_list_id},
+        }
+
+        params = {
+            "lang": "en",
+            "_": round(time() * 1000),
+            "opname": "AutoAssignableStudents",
+        }
+
+        return self.post_graphql(params, json.dumps(data))
+
     # MUTATIONS
 
     def stop_coaching(self, kaids):
@@ -430,3 +475,24 @@ class KhanAPI:
 
         return self.post_graphql(params, json.dumps(data))
 
+    def update_auto_assign(self, student_list_id, student_kaids, auto_assign=True):
+        """
+        A method to update the list of assignments to include students who have
+        recently been enrolled in the course.
+        :param: student_list_id, course id from khan academy
+        :param: student_kaids, a list of kaids for students being included
+        :param: auto_assign, boolean to determine if these students should be included
+        """
+        data = {
+            "operationName": "updateAutoAssign",
+            "query": gql.updateAutoAssign,
+            "variables": {
+                "studentListId": student_list_id,
+                "studentKaids": student_kaids,
+                "autoAssign": auto_assign,
+            },
+        }
+
+        params = {"lang": "en", "_": round(time() * 1000), "opname": "updateAutoAssign"}
+
+        return self.post_graphql(params, json.dumps(data))
