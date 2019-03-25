@@ -416,7 +416,7 @@ class KhanAPI:
                 "classId": class_id,
                 "assignmentFilters": {"dueAfter": None, "dueBefore": None},
                 "contentKinds": None,
-                "pageSize": 9,
+                "pageSize": None,
             },
         }
 
@@ -436,6 +436,58 @@ class KhanAPI:
             "lang": "en",
             "_": round(time() * 1000),
             "opname": "AutoAssignableStudents",
+        }
+
+        return self.post_graphql(params, json.dumps(data))
+
+    def coach_assignments(self, student_list_id, **kwargs):
+        """
+        Retrieve a list of all the assignments for a course and their meta data
+        Optional params to assist in filtering:
+            dueAfter: ISO 8601 datestring, like "2019-01-08T06:59:59.999Z"
+            dueBefore: ISO 8601 datestring, like "2019-01-08T06:59:59.999Z",
+            isDraft: Boolean,
+            orderBy: String of type "DUE_DATE_ASC",
+            pageSize: Int 
+        """
+        data = {
+            "operationName": "CoachAssignments",
+            "query": gql.CoachAssignments,
+            "variables": {
+                "after": None,
+                "assignmentFilters": {
+                    "dueAfter": kwargs.get("dueAfter"),
+                    "dueBefore": kwargs.get("dueBefore"),
+                    "isDraft": kwargs.get("isDraft", False),
+                },
+                "dueAfter": kwargs.get("dueAfter"),
+                "dueBefore": kwargs.get("dueBefore"),
+                "isDraft": kwargs.get("isDraft", False),
+                "orderBy": kwargs.get("orderBy", "DUE_DATE_ASC"),
+                "pageSize": kwargs.get("pageSize", 100),
+                "studentListId": student_list_id,
+            },
+        }
+
+        params = {"lang": "en", "_": round(time() * 1000), "opname": "CoachAssignments"}
+
+        return self.post_graphql(params, json.dumps(data))
+
+    def quiz_unit_test_attempts_query(self, topic_id, **kwargs):
+        """
+        Get the progress of the logged in user of quiz and unit tests for the
+        given topic id. 
+        """
+        data = {
+            "operationName": "quizAndUnitTestAttemptsQuery",
+            "query": gql.quizAndUnitTestAttemptsQuery,
+            "variables": {"topicId": topic_id},
+        }
+
+        params = {
+            "lang": "en",
+            "_": round(time() * 1000),
+            "opname": "quizAndUnitTestAttemptsQuery",
         }
 
         return self.post_graphql(params, json.dumps(data))
@@ -496,3 +548,25 @@ class KhanAPI:
         params = {"lang": "en", "_": round(time() * 1000), "opname": "updateAutoAssign"}
 
         return self.post_graphql(params, json.dumps(data))
+
+    def publish_assignment(self, assignment_id):
+        """
+        A method to move an assignment from saved to active
+        :param: assignment_id, int id of assignment from from khan academy, list
+        of saved assignment ids can be found using coach_assignments method, passing
+        isDraft=True keyword.
+        """
+        data = {
+            "operationName": "publishAssignment",
+            "query": gql.publishAssignment,
+            "variables": {"assignmentId": assignment_id},
+        }
+
+        params = {
+            "lang": "en",
+            "_": round(time() * 1000),
+            "opname": "publishAssignment",
+        }
+
+        return self.post_graphql(params, json.dumps(data))
+

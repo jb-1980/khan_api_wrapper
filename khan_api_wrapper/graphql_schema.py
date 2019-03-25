@@ -141,6 +141,33 @@ fragment StudentField on StudentsPage {
 }
 """
 
+quizAndUnitTestAttemptsQuery = """query quizAndUnitTestAttemptsQuery($topicId: String!, $kaid: String) {
+  user {
+    id
+    latestUnitTestAttempts(unitId: $topicId) {
+      id
+      numAttempted
+      numCorrect
+      completedDate
+      canResume
+      isCompleted
+      __typename
+    }
+    latestQuizAttempts(topicId: $topicId) {
+      id
+      numAttempted
+      numCorrect
+      completedDate
+      canResume
+      isCompleted
+      positionKey
+      __typename
+    }
+    __typename
+  }
+}
+"""
+
 progressByStudent = """query ProgressByStudent($assignmentFilters: CoachAssignmentFilters, $contentKinds: [LearnableContentKind], $classId: String!, $pageSize: Int, $after: ID) {
   coach {
     id
@@ -154,7 +181,6 @@ progressByStudent = """query ProgressByStudent($assignmentFilters: CoachAssignme
       assignmentsPage(filters: $assignmentFilters, after: $after, pageSize: $pageSize) {
         assignments(contentKinds: $contentKinds) {
           id
-          assignmentType
           dueDate
           contents {
             id
@@ -165,10 +191,7 @@ progressByStudent = """query ProgressByStudent($assignmentFilters: CoachAssignme
           }
           itemCompletionStates {
             completedOn
-            student {
-              id
-              __typename
-            }
+            studentKaid
             bestScore {
               numAttempted
               numCorrect
@@ -200,6 +223,47 @@ AutoAssignableStudents = """query AutoAssignableStudents($studentListId: String!
       autoAssignableStudents {
         id
         kaid
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+"""
+
+CoachAssignments = """query CoachAssignments($studentListId: String!, $assignmentFilters: CoachAssignmentFilters, $orderBy: AssignmentOrder!, $pageSize: Int, $after: ID) {
+  coach {
+    id
+    studentList(id: $studentListId) {
+      id
+      assignmentsPage(filters: $assignmentFilters, orderBy: $orderBy, after: $after, pageSize: $pageSize) {
+        assignments {
+          id
+          studentKaids
+          isDraft
+          subjectSlug
+          numStudentsCompleted
+          assignedDate
+          dueDate
+          contentDescriptors
+          contents {
+            id
+            title: translatedTitle
+            kind
+            defaultUrlPath
+            __typename
+          }
+          exerciseConfig {
+            itemPickerStrategy
+            __typename
+          }
+          __typename
+        }
+        pageInfo {
+          nextCursor
+          __typename
+        }
         __typename
       }
       __typename
@@ -252,5 +316,44 @@ updateAutoAssign = """mutation updateAutoAssign($studentListId: String!, $studen
     }
     __typename
   }
+}
+"""
+
+publishAssignment = """mutation publishAssignment($assignmentId: ID!) {
+  updateAssignment(id: $assignmentId, assignment: {isDraft: false}) {
+    assignment {
+      ...AssignmentInfoFragment
+      __typename
+    }
+    __typename
+  }
+}
+
+fragment AssignmentInfoFragment on Assignment {
+  id
+  contents {
+    id
+    title
+    __typename
+  }
+  studentList {
+    id
+    name
+    __typename
+  }
+  students {
+    id
+    kaid
+    __typename
+  }
+  coach {
+    id
+    kaid
+    __typename
+  }
+  dueDate
+  isDraft
+  subjectSlug
+  __typename
 }
 """
