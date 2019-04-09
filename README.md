@@ -29,9 +29,9 @@ $ python
 > khan_identifier = "username_of_account_used_to_register_app"
 > khan_password = "password_of_account_used_to_register_app"
 > kauth = KhanAcademySignIn(consumer_key, consumer_token, khan_identifier, khan_password)
-> token, secret = kauth.authenticate_self()
+> token, secret = kauth.authorize_self()
 >
-> kapi = KhanApi(consumer_key, consumer_token, token, secret)
+> kapi = KhanAPI(consumer_key, consumer_token, token, secret)
 > kapi.user() # should print your user data to console.
 >
 > # Use your own endpoint
