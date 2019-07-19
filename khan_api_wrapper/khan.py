@@ -5,7 +5,7 @@ import requests
 from khan_api_wrapper import graphql_schema as gql
 
 
-SERVER_URL = "http://www.khanacademy.org"
+SERVER_URL = "https://www.khanacademy.org"
 REQUEST_TOKEN_URL = SERVER_URL + "/api/auth2/request_token"
 ACCESS_TOKEN_URL = SERVER_URL + "/api/auth2/access_token"
 AUTHORIZE_URL = SERVER_URL + "/api/auth2/authorize"
