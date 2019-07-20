@@ -181,6 +181,9 @@ class KhanAPI:
 
     # EXERCISES
     def exercises(self, tags=[]):
+        # NOTE: There is a bug with this query. The return value is currently larger
+        # than the Khan Academy server limit an Khan Academy is returning a
+        # string error indicating so.
         """Retrieve a filtered list of exercises in the library.
         :param: tags, A comma-separated list of tags to filter on
         """
@@ -360,7 +363,37 @@ class KhanAPI:
                 out.append(datum)
         return out
 
-    def join_class(class_code):
+    def get_all_exercise_names_and_titles(self):
+        """
+        This will recurse through the data returned by the topics endpoint to
+        parse a list of all the exercise names and titles available on Khan Academy
+        """
+
+        def parse_data(data):
+            if type(data) == list:
+                return_dict = {}
+                for child in data:
+                    children = child.get("children")
+                    if children:
+                        return_dict = {**return_dict, **parse_data(children)}
+                    elif child.get("kind") == "Exercise":
+                        return_dict[child["id"]] = {
+                            "name": child["name"],
+                            "title": child["title"],
+                        }
+                return return_dict
+
+            children = data.get("children")
+            if children:
+                return parse_data(children)
+
+            if data.get("kind") == "Exercise":
+                return {data["id"]: {"name": data["name"], "title": data["title"]}}
+
+        topics = self.topictree("Exercise")
+        return list(parse_data(topics).values())
+
+    def join_class(self, class_code):
         """
         endpoint to join a class by the class code
         """
