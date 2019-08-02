@@ -281,13 +281,12 @@ class KhanAPI:
         """
         return self.get_resource("/api/v1/user/exercises/%s/log" % exercise, params)
 
-    def user_exercises_progress_changes(self, exercise, params={}):
+    def user_exercises_progress_changes(self, params={}):
         """
-        Retrieve a list of ProblemLog entities for one exercise for one user.
+        Retrieve a list of every mastery level promotion or demotion a learner
+        has received in any exercise, sorted by date.
         """
-        return self.get_resource(
-            "/api/v1/user/exercises/%s/progress_changes" % exercise, params
-        )
+        return self.get_resource("/api/v1/user/exercises/progress_changes", params)
 
     # TODO Finish implementing the user methods
 
