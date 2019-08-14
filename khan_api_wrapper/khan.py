@@ -364,6 +364,7 @@ class KhanAPI:
 
     def get_all_exercise_names_and_titles(self):
         """
+        (DEPRECATED) This seems to have missing exercises when compared with v2
         This will recurse through the data returned by the topics endpoint to
         parse a list of all the exercise names and titles available on Khan Academy
         """
@@ -391,6 +392,15 @@ class KhanAPI:
 
         topics = self.topictree("Exercise")
         return list(parse_data(topics).values())
+
+    def get_all_exercise_names_and_titles_v2(self):
+        """
+        This uses the /api/v2/ version of the topic tree. It takes longer, but
+        the list of exercises is larger.
+        """
+        endpoint = "/api/v2/topics/topictree"
+        tree = self.get_resource(endpoint)
+        return tree["exercises"]
 
     def join_class(self, class_code):
         """

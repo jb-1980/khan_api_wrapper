@@ -54,6 +54,7 @@ simpleCompletionQuery = """query simpleCompletionQuery($assignmentId: String!) {
 getStudentsList = """query getStudentsList($hasClassId: Boolean!, $classId: String!, $after: Int, $pageSize: Int) {
   coach {
     id
+    countStudents @skip(if: $hasClassId)
     studentsPage(after: $after, pageSize: $pageSize) @skip(if: $hasClassId) {
       ...StudentField
       __typename
@@ -69,12 +70,10 @@ getStudentsList = """query getStudentsList($hasClassId: Boolean!, $classId: Stri
     studentLists {
       id
       name
+      topicTitle
       key
-      students @skip(if: $hasClassId) {
-        id
-        kaid
-        __typename
-      }
+      studentKaids @skip(if: $hasClassId)
+      isDistrictSynced
       __typename
     }
     studentList(id: $classId) @include(if: $hasClassId) {
@@ -89,6 +88,7 @@ getStudentsList = """query getStudentsList($hasClassId: Boolean!, $classId: Stri
         iconPath
         __typename
       }
+      countStudents
       studentsPage(after: $after, pageSize: $pageSize) {
         ...StudentField
         __typename
@@ -101,6 +101,7 @@ getStudentsList = """query getStudentsList($hasClassId: Boolean!, $classId: Stri
         ...CoachRequestField
         __typename
       }
+      isDistrictSynced
       __typename
     }
     schoolAffiliation {
@@ -108,6 +109,11 @@ getStudentsList = """query getStudentsList($hasClassId: Boolean!, $classId: Stri
       __typename
     }
     affiliationCountryCode
+    __typename
+  }
+  user {
+    id
+    tosForFormalTeacherStatus
     __typename
   }
 }
@@ -127,15 +133,14 @@ fragment InvitationsField on Invitation {
 
 fragment StudentField on StudentsPage {
   students {
+    kaid
     id
     email
-    nickname
     coachNickname
     profileRoot
     username
     __typename
   }
-  countStudents
   nextCursor
   __typename
 }
