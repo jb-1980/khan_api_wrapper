@@ -1,9 +1,9 @@
 from rauth import OAuth1Service
 from time import time
+from datetime import datetime
 import json
 import requests
 from khan_api_wrapper import graphql_schema as gql
-
 
 SERVER_URL = "https://www.khanacademy.org"
 REQUEST_TOKEN_URL = SERVER_URL + "/api/auth2/request_token"
@@ -264,7 +264,7 @@ class KhanAPI:
             "/api/v1/user/exercises/" + exercise, params=identifier
         )
 
-    def user_exercises_followup_exercises(self, exercise, indentifier={}):
+    def user_exercises_followup_exercises(self, exercise, identifier={}):
         """Retrieve info about all specific exercise listed as a prerequisite to
         <exercise_name>
         :param: exercise, the specific exercise to get info for
@@ -287,6 +287,26 @@ class KhanAPI:
         has received in any exercise, sorted by date.
         """
         return self.get_resource("/api/v1/user/exercises/progress_changes", params)
+
+    def user_progress_summary(kind, identifier={}):
+        """
+        Return progress for a content type with started and completed lists.
+        Takes a comma-separated `kind` param, like:
+            /api/v1/user/progress_summary?kind=Video,Article
+        and returns a dictionary that looks like:
+            {"complete": ["a1314267931"], "started": []}
+        """
+        params = {"kind": kind, **identifier}
+        return self.get_resource("/api/v1/user/progress_summary", params)
+
+    def user_students():
+        """
+        Return a list of all students, with same data values as the user method.
+        Note: If you coach a lot of students this will usually not work.
+        Pro Tip: If you are only looking for student identifiers, use the 
+        `get_student_list` method instead. It is a lot faster
+        """
+        return self.get_resource("/api/v1/user/students")
 
     # TODO Finish implementing the user methods
 
@@ -311,6 +331,14 @@ class KhanAPI:
         return self.get_resource("/api/internal/user/missions", params)
 
     def get_student_list(self, params={}):
+        params = {
+            # these params will allow us to get all students from the
+            # epoch to right now. (well, up to the second at least)
+            "dt_start": "1970-01-01T00:00:00.000Z",
+            "dt_end": datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
+            **params,
+        }
+
         r = self.get_resource("/api/internal/user/students/progress", params)
         return r["students"]
 
