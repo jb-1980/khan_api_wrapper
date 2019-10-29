@@ -3,7 +3,7 @@
 simpleCompletionQuery = """query simpleCompletionQuery($assignmentId: String!) {
   coach {
     id
-    assignment(id: $assignmentId) {
+    assignment: assignmentByThisUser(id: $assignmentId) {
       contents {
         id
         translatedTitle
