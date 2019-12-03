@@ -41,6 +41,7 @@ simpleCompletionQuery = """query simpleCompletionQuery($assignmentId: String!) {
       }
       studentList {
         id
+        cacheId
         name
         __typename
       }
