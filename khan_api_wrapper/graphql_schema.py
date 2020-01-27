@@ -225,6 +225,7 @@ AutoAssignableStudents = """query AutoAssignableStudents($studentListId: String!
     id
     studentList(id: $studentListId) {
       id
+      cacheId
       name
       autoAssignableStudents {
         id
@@ -237,6 +238,7 @@ AutoAssignableStudents = """query AutoAssignableStudents($studentListId: String!
   }
 }
 """
+
 
 CoachAssignments = """query CoachAssignments($studentListId: String!, $assignmentFilters: CoachAssignmentFilters, $orderBy: AssignmentOrder!, $pageSize: Int, $after: ID) {
   coach {
