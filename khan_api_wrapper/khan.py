@@ -477,16 +477,18 @@ class KhanAPI:
 
         return self.post_graphql(params, json.dumps(data))
 
-    def get_progress_by_student(self, class_id):
+    def get_progress_by_student(
+        self, class_id, dueAfter=None, dueBefore=None, contentKinds=None, pageSize=None
+    ):
 
         data = {
             "operationName": "ProgressByStudent",
             "query": gql.progressByStudent,
             "variables": {
                 "classId": class_id,
-                "assignmentFilters": {"dueAfter": None, "dueBefore": None},
-                "contentKinds": None,
-                "pageSize": None,
+                "assignmentFilters": {"dueAfter": dueAfter, "dueBefore": dueBefore},
+                "contentKinds": contentKinds,
+                "pageSize": pageSize,
             },
         }
 
