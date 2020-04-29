@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="khan_api_wrapper",
-    version="0.0.17",
+    version="0.0.18",
     author="Joseph Gilgen",
     author_email="gilgenlabs@gmail.com",
     description="Simple, direct Python 3 wrapper for the Khan Academy API",
