@@ -271,7 +271,7 @@ class KhanAPI:
         :param: identifier, one of four identifiers: username, userid, email, kaid
         """
         return self.get_resource(
-            "/api/v1/user/exercises/%s/followup_exercises" % exercise_name,
+            "/api/v1/user/exercises/%s/followup_exercises" % exercise,
             params=identifier,
         )
 
@@ -288,7 +288,7 @@ class KhanAPI:
         """
         return self.get_resource("/api/v1/user/exercises/progress_changes", params)
 
-    def user_progress_summary(kind, identifier={}):
+    def user_progress_summary(self, kind, identifier={}):
         """
         Return progress for a content type with started and completed lists.
         Takes a comma-separated `kind` param, like:
@@ -299,7 +299,7 @@ class KhanAPI:
         params = {"kind": kind, **identifier}
         return self.get_resource("/api/v1/user/progress_summary", params)
 
-    def user_students():
+    def user_students(self):
         """
         Return a list of all students, with same data values as the user method.
         Note: If you coach a lot of students this will usually not work.

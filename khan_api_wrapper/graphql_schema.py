@@ -198,7 +198,7 @@ progressByStudent = """query ProgressByStudent($assignmentFilters: CoachAssignme
             defaultUrlPath
             __typename
           }
-          itemCompletionStates {
+          itemCompletionStates: itemCompletionStatesForAllStudents {
             completedOn
             studentKaid
             bestScore {
